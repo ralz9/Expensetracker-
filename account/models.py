@@ -24,6 +24,7 @@ class CustomUserManager(UserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
@@ -36,9 +37,8 @@ class CustomUserManager(UserManager):
 class CustomUser(AbstractUser):
     email = models.CharField(unique=True)
     activation_code = models.CharField(max_length=60)
-    is_active = models.BooleanField(default=False)
     username = None
-
+    recovery_code = models.CharField(max_length=60)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -51,4 +51,7 @@ class CustomUser(AbstractUser):
         code = str(uuid.uuid4())
         self.activation_code = code
 
-
+    def create_recovery_code(self):
+        import random
+        code = str(random.randint(1, 9999))
+        self.recovery_code = code

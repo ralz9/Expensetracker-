@@ -7,3 +7,12 @@ def send_activation_code(email, code):
         'rodiondereha@gmail.com',
         [email]
     )
+
+
+def send_recovery_code(email, code):
+    send_mail(
+        'Activate your account',
+        f'скоприутйе ваш cod для смены пароля  {code}',
+        'rodiondereha@gmail.com',
+        [email]
+    )

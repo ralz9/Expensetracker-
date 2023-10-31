@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.serializers import RegisterSerializer
+from account.serializers import RegisterSerializer, ChangePasswordSerializers, PasswordRecoverySerializer, PasswordRecoverySetSerializer
 
 User = get_user_model()
 class RegisterView(APIView):
@@ -20,8 +21,31 @@ class ActivateAPIView(APIView):
         user.save()
         return Response('Успешно ', status=200)
 
+class ChangePasswordAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
-class ChangePassword(APIView):
     def post(self, request):
-        serializers = ...
-        pass
+        serializers = ChangePasswordSerializers(data=request.data)
+        serializers.is_valid(raise_exception=True)
+        serializers.set_new_password()
+        return Response('Вы успешно сменили пароль', status=200)
+
+
+permission_classes = [AllowAny]
+class PasswordRecoveryAPIView(APIView):
+    def post(self, request):
+        serializer = PasswordRecoverySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response('Вам отправлненно сообщение на почту')
+
+
+class PasswordRecoverySetAPIView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        serializer = PasswordRecoverySetSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.set_new_password()
+        return Response('Вы успешно сменили пароль ')
+
+
+
